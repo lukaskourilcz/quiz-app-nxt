@@ -18,7 +18,7 @@ User Answer: ${userAnswer}
 
 Task:
 1. Score the user answer from 0 (bad) to 5 (excellent).
-2. Provide the correct/ideal answer in 1–2 sentences.
+2. Provide the correct/ideal answer in 2–3 sentences.
 
 Rules:
 - Respond in *valid JSON only*

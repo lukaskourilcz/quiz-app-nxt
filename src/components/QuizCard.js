@@ -1,22 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import questions from "@/data/questions";
 
-function getRandomQuestions(allQuestions, count = 10) {
-  const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-}
-
 export default function QuizCard() {
-  const [quizQuestions, setQuizQuestions] = useState(() =>
-    getRandomQuestions(questions, 10)
-  );
+  const [quizQuestions, setQuizQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [totalScore, setTotalScore] = useState(0);
+  const [hint, setHint] = useState(null);
+  const [loadingHint, setLoadingHint] = useState(false);
+
+  useEffect(() => {
+    setQuizQuestions(
+      [...questions].sort(() => 0.5 - Math.random()).slice(0, 10)
+    );
+  }, []);
 
   const question = quizQuestions[current];
+
   let progress = ((current + 1) / quizQuestions.length) * 100;
   if (current === 0 && !feedback) {
     progress = 0;
@@ -43,6 +45,7 @@ export default function QuizCard() {
   const handleNext = () => {
     setFeedback(null);
     setAnswer("");
+    setHint(null);
     setCurrent((prev) => prev + 1);
   };
 
@@ -52,6 +55,19 @@ export default function QuizCard() {
     setAnswer("");
     setFeedback(null);
     setTotalScore(0);
+  };
+
+  const handleHint = async () => {
+    setLoadingHint(true);
+    const res = await fetch("/api/hint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: question.text }),
+    });
+
+    const data = await res.json();
+    setHint(data.hint);
+    setLoadingHint(false);
   };
 
   if (!question) {
@@ -93,10 +109,26 @@ export default function QuizCard() {
         />
       </div>
 
-      <p className="font-semibold mb-2">
-        Question {current + 1} / {quizQuestions.length}
-      </p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="font-semibold">
+          Question {current + 1} / {quizQuestions.length}
+        </p>
+        <button
+          onClick={handleHint}
+          className="flex items-center gap-1 text-yellow-600 hover:text-yellow-700 font-medium"
+          disabled={loadingHint}
+        >
+          💡 {loadingHint ? "Loading..." : "Hint"}
+        </button>
+      </div>
+
       <h2 className="text-lg font-medium mb-4">{question.text}</h2>
+
+      {hint && (
+        <p className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-gray-800">
+          {hint}
+        </p>
+      )}
 
       {!feedback && (
         <form onSubmit={handleSubmit}>
@@ -117,14 +149,24 @@ export default function QuizCard() {
       )}
 
       {feedback && typeof feedback === "object" && (
-        <div className="mt-4">
+        <div
+          className={`mt-4 p-4 rounded-md ${
+            feedback.score < 3
+              ? "bg-red-200"
+              : feedback.score === 3
+              ? "bg-orange-200"
+              : "bg-green-200"
+          }`}
+        >
+          {" "}
           <p className="font-semibold">AI Score: {feedback.score}/5</p>
           <p className="mt-2 text-gray-700">
-            ✅ Correct Answer: {feedback.correctAnswer}
+            <span className="font-bold">✅ Correct Answer:</span>{" "}
+            {feedback.correctAnswer}
           </p>
           <button
             onClick={handleNext}
-            className="mt-4 w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
+            className="mt-4 w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition"
           >
             Next Question →
           </button>
