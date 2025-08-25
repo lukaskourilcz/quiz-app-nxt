@@ -2,15 +2,22 @@
 import { useState } from "react";
 import questions from "@/data/questions";
 
+function getRandomQuestions(allQuestions, count = 10) {
+  const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
 export default function QuizCard() {
+  const [quizQuestions, setQuizQuestions] = useState(() =>
+    getRandomQuestions(questions, 10)
+  );
   const [current, setCurrent] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [totalScore, setTotalScore] = useState(0);
 
-  const question = questions[current];
-
-  const progress = ((current + 1) / questions.length) * 100;
+  const question = quizQuestions[current];
+  const progress = ((current + 1) / quizQuestions.length) * 100;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +27,7 @@ export default function QuizCard() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        question: questions[current].text,
+        question: question.text,
         userAnswer: answer,
       }),
     });
@@ -36,11 +43,25 @@ export default function QuizCard() {
     setCurrent((prev) => prev + 1);
   };
 
+  const handleRestart = () => {
+    setQuizQuestions(getRandomQuestions(questions, 10));
+    setCurrent(0);
+    setAnswer("");
+    setFeedback(null);
+    setTotalScore(0);
+  };
+
   if (!question) {
     return (
       <div className="p-6 bg-white rounded-xl shadow w-full max-w-2xl text-center">
         <h1 className="text-2xl font-bold mb-4">Quiz Finished 🎉</h1>
-        <p className="text-lg">Your total score: {totalScore}</p>
+        <p className="text-lg mb-4">Your total score: {totalScore}</p>
+        <button
+          onClick={handleRestart}
+          className="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
+        >
+          🔄 Try Another 10 Questions
+        </button>
       </div>
     );
   }
@@ -49,11 +70,15 @@ export default function QuizCard() {
     <div className="w-full max-w-2xl bg-white rounded-xl shadow p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <span role="img" aria-label="brain">🧠</span>
+          <span role="img" aria-label="brain">
+            🧠
+          </span>
           React & JS Quiz (AI powered)
         </h1>
         <p className="text-sm flex items-center gap-1">
-          <span role="img" aria-label="ticket">🎟️</span>
+          <span role="img" aria-label="ticket">
+            🎟️
+          </span>
           Score: {totalScore}
         </p>
       </div>
@@ -66,7 +91,7 @@ export default function QuizCard() {
       </div>
 
       <p className="font-semibold mb-2">
-        Question {current + 1} / {questions.length}
+        Question {current + 1} / {quizQuestions.length}
       </p>
       <h2 className="text-lg font-medium mb-4">{question.text}</h2>
 
