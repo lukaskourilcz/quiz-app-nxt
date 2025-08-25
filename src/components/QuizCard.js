@@ -92,7 +92,7 @@ export default function QuizCard() {
           <span role="img" aria-label="brain">
             🧠
           </span>
-          React & JS Quiz (AI powered)
+          React & JS Quiz (AI powered ⚡️)
         </h1>
         <p className="text-sm flex items-center gap-1">
           <span role="img" aria-label="ticket">
