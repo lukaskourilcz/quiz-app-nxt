@@ -1,7 +1,11 @@
+import QuizCard from "@/components/QuizCard";
+
 export default function Home() {
   return (
     <>
-      <h1>QuizApp</h1>
+      <main>
+        <QuizCard />
+      </main>
     </>
   );
 }
