@@ -8,7 +8,7 @@ export default function QuizCard() {
     id: 1,
     text: "What are computed properties in React?",
     current: 1,
-    total: 50,
+    total: 10,
     score: 0,
     maxScore: 0,
   };
