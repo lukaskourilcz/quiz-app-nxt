@@ -11,24 +11,38 @@ export async function POST(req) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-    Question: ${question}
-    User Answer: ${userAnswer}
-    
-    Task:
-    1. Score the user answer from 1 (bad) to 5 (excellent).
-    2. Provide the correct/ideal answer in 1-2 sentences.
-    
-    Respond in JSON only with keys: "score" and "correctAnswer".
-    `;
+You are a strict grader.
+
+Question: ${question}
+User Answer: ${userAnswer}
+
+Task:
+1. Score the user answer from 1 (bad) to 5 (excellent).
+2. Provide the correct/ideal answer in 1–2 sentences.
+
+Rules:
+- Respond in *valid JSON only*
+- No extra text, no explanations
+- Format exactly like this:
+{"score": 3, "correctAnswer": "Your correct answer here"}
+`;
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    let text = result.response.text();
+
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     let output;
     try {
       output = JSON.parse(text);
     } catch {
-      output = { score: 0, correctAnswer: "Error parsing Gemini response." };
+      output = {
+        score: 0,
+        correctAnswer: "Error parsing Gemini response: " + text,
+      };
     }
 
     return NextResponse.json(output);
