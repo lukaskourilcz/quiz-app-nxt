@@ -1,17 +1,14 @@
 "use client";
 import { useState } from "react";
-
-const questions = [
-  { text: "What are computed properties in Vue?", id: 1 },
-  { text: "What is the difference between let and var in JS?", id: 2 },
-  // Add more questions here
-];
+import questions from "@/data/questions";
 
 export default function QuizCard() {
   const [current, setCurrent] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [totalScore, setTotalScore] = useState(0);
+
+  const question = questions[current];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,8 +34,6 @@ export default function QuizCard() {
     setCurrent((prev) => prev + 1);
   };
 
-  const question = questions[current];
-
   if (!question) {
     return (
       <div className="p-6 bg-white rounded-xl shadow w-full max-w-2xl text-center">
@@ -50,24 +45,26 @@ export default function QuizCard() {
 
   return (
     <div className="w-full max-w-2xl bg-white rounded-xl shadow p-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <span role="img" aria-label="brain">🧠</span> Vue & JS Quiz (AI powered)
+          <span role="img" aria-label="brain">
+            🧠
+          </span>{" "}
+          React & JS Quiz (AI powered)
         </h1>
         <p className="text-sm flex items-center gap-1">
-          <span role="img" aria-label="ticket">🎟️</span>
+          <span role="img" aria-label="ticket">
+            🎟️
+          </span>
           Score: {totalScore}
         </p>
       </div>
 
-      {/* Question */}
       <p className="font-semibold mb-2">
         Question {current + 1} / {questions.length}
       </p>
       <h2 className="text-lg font-medium mb-4">{question.text}</h2>
 
-      {/* Answer Form */}
       {!feedback && (
         <form onSubmit={handleSubmit}>
           <textarea
@@ -86,7 +83,6 @@ export default function QuizCard() {
         </form>
       )}
 
-      {/* Feedback */}
       {feedback && typeof feedback === "object" && (
         <div className="mt-4">
           <p className="font-semibold">AI Score: {feedback.score}/5</p>

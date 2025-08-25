@@ -17,7 +17,7 @@ Question: ${question}
 User Answer: ${userAnswer}
 
 Task:
-1. Score the user answer from 1 (bad) to 5 (excellent).
+1. Score the user answer from 0 (bad) to 5 (excellent).
 2. Provide the correct/ideal answer in 1–2 sentences.
 
 Rules:
