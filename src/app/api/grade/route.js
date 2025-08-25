@@ -1,11 +1,23 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("Missing GEMINI_API_KEY in environment variables.");
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(req) {
   try {
     const { question, userAnswer } = await req.json();
+
+    if (!question || !userAnswer) {
+      return NextResponse.json(
+        { error: "Question and userAnswer are required" },
+        { status: 400 }
+      );
+    }
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -27,26 +39,32 @@ Rules:
 `;
 
     const result = await model.generateContent(prompt);
-    let text = result.response.text();
+
+    if (!result?.response) {
+      throw new Error("No response from Gemini API.");
+    }
+
+    let text = result.response.text().trim();
 
     text = text
-      .replace(/```json/g, "")
+      .replace(/```json/gi, "")
       .replace(/```/g, "")
       .trim();
 
     let output;
     try {
       output = JSON.parse(text);
-    } catch {
+    } catch (parseErr) {
+      console.error("Failed to parse Gemini response:", text);
       output = {
         score: 0,
-        correctAnswer: "Error parsing Gemini response: " + text,
+        correctAnswer: "Error parsing Gemini response",
       };
     }
 
     return NextResponse.json(output);
   } catch (err) {
-    console.error(err);
+    console.error("Grade API error:", err);
     return NextResponse.json(
       { score: 0, correctAnswer: "Server error" },
       { status: 500 }
