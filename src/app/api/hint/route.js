@@ -6,10 +6,18 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   try {
     const { question } = await req.json();
+
+    if (!question) {
+      return NextResponse.json(
+        { hint: "No question provided" },
+        { status: 400 }
+      );
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-    Provide a short helpful hint for the following quiz question. 
+    Provide a short helpful hint for this quiz question.
     Do not give the full answer, just a clue that helps recall the concept.
 
     Question: ${question}
@@ -18,11 +26,16 @@ export async function POST(req) {
     `;
 
     const result = await model.generateContent(prompt);
-    const hint = result.response.text().trim();
+    let hint = result.response.text().trim();
+
+    hint = hint.replace(/```/g, "").trim();
 
     return NextResponse.json({ hint });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ hint: "Error fetching hint." }, { status: 500 });
+    console.error("Hint API error:", err);
+    return NextResponse.json(
+      { hint: "Error fetching hint." },
+      { status: 500 }
+    );
   }
 }
