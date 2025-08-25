@@ -46,7 +46,7 @@ Respond in plain text only (1–2 sentences).
   } catch (err) {
     console.error("Hint API error:", err);
     return NextResponse.json(
-      { hint: "Error fetching hint." },
+      { hint: "Server error: " + (err.message || "unknown") },
       { status: 500 }
     );
   }

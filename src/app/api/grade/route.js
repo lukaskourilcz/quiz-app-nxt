@@ -68,7 +68,7 @@ Rules:
   } catch (err) {
     console.error("Grade API error:", err);
     return NextResponse.json(
-      { score: 0, correctAnswer: "Server error" },
+      { hint: "Server error: " + (err.message || "unknown") },
       { status: 500 }
     );
   }
