@@ -2,6 +2,11 @@
 import { useState, useEffect } from "react";
 import questions from "@/data/questions";
 
+function getRandomQuestions(allQuestions, count = 10) {
+  const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
 export default function QuizCard() {
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -12,9 +17,7 @@ export default function QuizCard() {
   const [loadingHint, setLoadingHint] = useState(false);
 
   useEffect(() => {
-    setQuizQuestions(
-      [...questions].sort(() => 0.5 - Math.random()).slice(0, 10)
-    );
+    setQuizQuestions(getRandomQuestions(questions, 10));
   }, []);
 
   const question = quizQuestions[current];
@@ -55,6 +58,7 @@ export default function QuizCard() {
     setAnswer("");
     setFeedback(null);
     setTotalScore(0);
+    setHint(null);
   };
 
   const handleHint = async () => {
@@ -158,7 +162,6 @@ export default function QuizCard() {
               : "bg-green-200"
           }`}
         >
-          {" "}
           <p className="font-semibold">AI Score: {feedback.score}/5</p>
           <p className="mt-2 text-gray-700">
             <span className="font-bold">✅ Correct Answer:</span>{" "}
@@ -168,7 +171,9 @@ export default function QuizCard() {
             onClick={handleNext}
             className="mt-4 w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition"
           >
-            Next Question →
+            {current === quizQuestions.length - 1
+              ? "See Results 🎉"
+              : "Next Question →"}
           </button>
         </div>
       )}
