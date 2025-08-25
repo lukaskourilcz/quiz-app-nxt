@@ -10,6 +10,8 @@ export default function QuizCard() {
 
   const question = questions[current];
 
+  const progress = ((current + 1) / questions.length) * 100;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback("Grading...");
@@ -47,17 +49,20 @@ export default function QuizCard() {
     <div className="w-full max-w-2xl bg-white rounded-xl shadow p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <span role="img" aria-label="brain">
-            🧠
-          </span>{" "}
+          <span role="img" aria-label="brain">🧠</span>
           React & JS Quiz (AI powered)
         </h1>
         <p className="text-sm flex items-center gap-1">
-          <span role="img" aria-label="ticket">
-            🎟️
-          </span>
+          <span role="img" aria-label="ticket">🎟️</span>
           Score: {totalScore}
         </p>
+      </div>
+
+      <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+        <div
+          className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       <p className="font-semibold mb-2">
