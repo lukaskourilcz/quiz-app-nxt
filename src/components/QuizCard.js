@@ -17,7 +17,10 @@ export default function QuizCard() {
   const [totalScore, setTotalScore] = useState(0);
 
   const question = quizQuestions[current];
-  const progress = ((current + 1) / quizQuestions.length) * 100;
+  let progress = ((current + 1) / quizQuestions.length) * 100;
+  if (current === 0 && !feedback) {
+    progress = 0;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
